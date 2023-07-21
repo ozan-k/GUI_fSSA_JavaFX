@@ -1,6 +1,7 @@
 package com.ozank.simulation;
 
 import com.ozank.lexerParser.ModelBuilder;
+import com.ozank.simulator.SimulationApplicationSSA;
 import com.ozank.simulator.SimulationModel;
 import com.ozank.simulator.SimulationSSA;
 

@@ -13,16 +13,17 @@
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <BorderPane fx:controller="com.ozank.fluxgui.Controller"
             xmlns:fx="http://javafx.com/fxml">
     <center>
         <SplitPane>
-            <SplitPane orientation="VERTICAL" dividerPositions="0.67">
+            <SplitPane orientation="VERTICAL" dividerPositions="0.67" minWidth="360">
                 <BorderPane>
                     <top>
-                        <HBox spacing="10">
+                        <HBox spacing="10" alignment="CENTER">
                             <padding>
-                                <Insets left="10"/>
+                                <Insets left="20" right="10"/>
                             </padding>
                             <GridPane>
                                 <Label text="Font " GridPane.columnIndex="0" GridPane.rowIndex="0"/>
@@ -37,6 +38,7 @@
                             </GridPane>
                             <Button text="Run" prefWidth="60" onAction="#onRunButtonClick"/>
                             <Button text="Reset" prefWidth="60" onAction="#onResetButtonClick"/>
+                            <CheckBox text="Time series" textAlignment="CENTER" selected="true" fx:id="timeSeriesCheckBox"/>
                         </HBox>
                     </top>
                     <center>
@@ -50,10 +52,9 @@
                         </AnchorPane>
                     </center>
                 </BorderPane>
+                <!-- ##################### -->
+                <VBox fx:id="plotSelectVBox">
 
-<!--                    <Label text="A"/>-->
-                <VBox>
-                    <Label text="B"/>
                 </VBox>
             </SplitPane>
             <SplitPane orientation="VERTICAL">

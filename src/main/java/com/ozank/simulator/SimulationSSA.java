@@ -1,5 +1,9 @@
 package com.ozank.simulator;
 
+import com.ozank.fluxgui.ProgressForm;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -10,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SimulationSSA {
-    Random r = new Random(3);
+    Random r = new Random();
     private final SimulationModel model;
     private final Matrix<PairIndex> matrixM;
     private final Matrix<TripleIndex> matrixF;
@@ -205,14 +209,42 @@ public class SimulationSSA {
     };
 
     public void simulateWithTimeLimit(double endTime){
-        while(time <endTime){
-            if (aj[0].doubleValue() == 0) {
-                //b.setValue(100);
-                break;
-            } else {
-                simulationStep();
+        ProgressForm pForm = new ProgressForm();
+        Task<Void> task = new Task() {
+            @Override
+            public Void call() //throws InterruptedException
+            {
+                int i =1;
+                double timeInterval = endTime/100;
+                double nextTime = timeInterval;
+                while(time <endTime){
+                    if (aj[0].doubleValue() == 0) {
+                        break;
+                    } else {
+                        if (time > nextTime){
+                            i++;
+                            nextTime = i*timeInterval;
+                            updateProgress(i, 100);
+                        }
+                        simulationStep();
+                    }
+                }
+
+                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                Platform.runLater(() -> {
+                    System.out.println("Done");
+                });
+                return null;
             }
-        }
+        };
+        pForm.activateProgressBar(task);
+        task.setOnSucceeded(event -> {
+            pForm.getDialogStage().close();
+        });
+        pForm.getDialogStage().show();
+        Thread thread = new Thread(task);
+        thread.start();
+
     }
 
     public Matrix<PairIndex> getM(){
