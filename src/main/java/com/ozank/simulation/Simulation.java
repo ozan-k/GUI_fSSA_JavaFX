@@ -1,9 +1,9 @@
 package com.ozank.simulation;
 
 import com.ozank.lexerParser.ModelBuilder;
-import com.ozank.simulator.SimulationApplicationSSA;
-import com.ozank.simulator.SimulationModel;
 import com.ozank.simulator.SimulationSSA;
+import com.ozank.simulator.SimulationModel;
+
 
 import java.util.ArrayList;
 import java.util.List;
