@@ -53,6 +53,9 @@ public class Controller implements Initializable {
     @FXML
     private VBox completeFluxesVBox;
 
+    @FXML
+    private CheckBox autoLayoutCheckBox;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         modelCodeArea.setStyle("-fx-font-size:10pt;");
@@ -320,6 +323,15 @@ public class Controller implements Initializable {
         // viewer.disableAutoLayout();
         // Do some work ...
         viewer.enableAutoLayout();
+        autoLayoutCheckBox.selectedProperty().addListener((event) -> {
+            System.out.println(autoLayoutCheckBox.isSelected());
+            if (!autoLayoutCheckBox.isSelected()){
+                viewer.disableAutoLayout(); }
+            else {
+                viewer.enableAutoLayout();
+            }
+        });
+
 
         graph.setStrict(false);
         graph.setAutoCreate( true );
@@ -329,35 +341,25 @@ public class Controller implements Initializable {
             int b = t.getB();
             int c = t.getC();
             graph.addEdge(edgeId,Integer.toString(a),Integer.toString(b),true);
+            int weight = simulation.getF().get(t);
+            double edgeWeight = (double) Math.log10(weight);
+            //styleSheet = styleSheet + "edge#"+ edgeId + "{size: "+ edgeWeight +";}";
+            graph.getEdge(edgeId).setAttribute("ui.style","size: " + edgeWeight +";");
             edgeMap.put(edgeId, new Flux(
                     a,model.getReactionNames()[a],
                     b,model.getReactionNames()[b],
                     c,model.getMoleculesList().get(c),
-                    simulation.getF().get(t)));
+                    weight));
         };
 
-        //model.getState();
-        model.getReactionNames();
-        model.getReactionRates();
-        model.getLeft();
-        model.getRight();
-        model.getReactionDependencies();
-        model.getMoleculesList();
-        for (Node node : graph) {
+       for (Node node : graph) {
             node.setAttribute("ui.label", node.getId());
         }
-
-
-
-
 
         graph.setAttribute( "ui.antialias" );
         graph.setAttribute( "ui.quality" );
         graph.setAttribute( "ui.stylesheet", styleSheet );
 
-//        graph.getNode("A").setAttribute("xyz", -1, 0, 0 );
-//        graph.getNode("B").setAttribute("xyz",  1, 0, 0 );
-//        graph.getNode("C").setAttribute("xyz",  0, 1, 0 );
 
         FxViewPanel v =  (FxViewPanel) viewer.addDefaultView( false ) ;
         completeFluxesVBox.getChildren().add(v);

@@ -60,6 +60,7 @@
             </SplitPane>
             <SplitPane orientation="VERTICAL">
                 <VBox fx:id="completeFluxesVBox">
+                    <CheckBox fx:id="autoLayoutCheckBox" selected="true"/>
                 </VBox>
                 <VBox>
                     <Label text="D"/>
