@@ -33,16 +33,15 @@ public class SimulationSSA {
     private final int every;
     private final double interval;
     private double nextIntervalEnd;
-    private final boolean updateTrajectory;
     private final boolean trackIntervals;
     private final List<Matrix<TripleIndex>> intervalFluxes;
-
+    private boolean updateTrajectoryFlag;
 
     public SimulationSSA(SimulationModel model,int every,double interval){
         this.every = every;
         this.interval = interval;
         this.model = model;
-        this.updateTrajectory = every != 0;
+        this.updateTrajectoryFlag = every != 0;
         this.trackIntervals = interval != 0;
 
         int[] initialState = model.getState();
@@ -186,7 +185,7 @@ public class SimulationSSA {
         updateState(mu);
         updatePropensities(reactionDependencies[mu]);
         updateFluxes(mu);
-        if (updateTrajectory) {
+        if (updateTrajectoryFlag) {
             if (stepCount % every==0) {
                 updateTrajectory();
             }
@@ -208,7 +207,8 @@ public class SimulationSSA {
         }
     };
 
-    public void simulateWithTimeLimit(double endTime){
+    public void simulateWithTimeLimit(double endTime,boolean timeSeries)  {
+        updateTrajectoryFlag = timeSeries;
         ProgressForm pForm = new ProgressForm();
         Task<Void> task = new Task() {
             @Override
@@ -232,7 +232,7 @@ public class SimulationSSA {
 
                 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 Platform.runLater(() -> {
-                    System.out.println("Done");
+                   // ~~~~~~~~~~~~~
                 });
                 return null;
             }
@@ -244,7 +244,6 @@ public class SimulationSSA {
         pForm.getDialogStage().show();
         Thread thread = new Thread(task);
         thread.start();
-
     }
 
     public Matrix<PairIndex> getM(){
@@ -255,11 +254,16 @@ public class SimulationSSA {
         return matrixF;
     }
 
+    public List<TrajectoryState> getTrajectory() {
+        return trajectory;
+    }
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void writeToFile(String filePath){
         // "src/main/resources/files-write-names.txt"
-        String content =  trajectory.stream().map(x->x.toString()).reduce("", String::concat);
+        String content = "Time, " +   String.join(", ",model.getMoleculesList()) + "\n";
+        content = content + trajectory.stream().map(x->x.toString()).reduce("", String::concat);
         Path path = Path.of(filePath);
         try {
             Files.writeString(path, content);
@@ -267,6 +271,8 @@ public class SimulationSSA {
             e.printStackTrace();
         }
     }
+
+
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     public void printPropensities(){
         System.out.println("Reaction propensities");
@@ -304,6 +310,10 @@ public class SimulationSSA {
         return intervalFluxes;
     }
     public void tester(){
+    }
+
+    public SimulationModel getModel(){
+        return model;
     }
 
 }

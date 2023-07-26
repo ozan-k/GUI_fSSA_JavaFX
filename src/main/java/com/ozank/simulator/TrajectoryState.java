@@ -12,6 +12,14 @@ public class TrajectoryState {
         this.state = state;
     }
 
+    public double getTime() {
+        return time;
+    }
+
+    public int[] getState() {
+        return state;
+    }
+
     @Override
     public String toString(){
         String result = IntStream.of(state)

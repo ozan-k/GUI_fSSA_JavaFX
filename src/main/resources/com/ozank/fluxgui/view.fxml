@@ -18,26 +18,27 @@
             xmlns:fx="http://javafx.com/fxml">
     <center>
         <SplitPane>
-            <SplitPane orientation="VERTICAL" dividerPositions="0.67" minWidth="360">
+            <SplitPane orientation="VERTICAL" dividerPositions="0.65">
+            <!--                minWidth="300">-->
                 <BorderPane>
                     <top>
                         <HBox spacing="10" alignment="CENTER">
                             <padding>
-                                <Insets left="20" right="10"/>
+                                <Insets left="20" right="10" bottom="4" top="4"/>
                             </padding>
                             <GridPane>
                                 <Label text="Font " GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                <Spinner min="6"
+                                <Spinner min="2"
                                          max="40"
                                          prefWidth="60"
-                                         initialValue="12"
+                                         initialValue="10"
                                          editable="false"
                                          fx:id="fontSpinner"
                                          GridPane.columnIndex="1"
                                          GridPane.rowIndex="0"/>
                             </GridPane>
                             <Button text="Run" prefWidth="60" onAction="#onRunButtonClick"/>
-                            <Button text="Reset" prefWidth="60" onAction="#onResetButtonClick"/>
+                            <Button text="Plot Fluxes" prefWidth="80" onAction="#onFluxButtonClick" fx:id="fluxButton"/>
                             <CheckBox text="Time series" textAlignment="CENTER" selected="true" fx:id="timeSeriesCheckBox"/>
                         </HBox>
                     </top>
@@ -58,8 +59,7 @@
                 </VBox>
             </SplitPane>
             <SplitPane orientation="VERTICAL">
-                <VBox>
-                    <Label text="C"/>
+                <VBox fx:id="completeFluxesVBox">
                 </VBox>
                 <VBox>
                     <Label text="D"/>

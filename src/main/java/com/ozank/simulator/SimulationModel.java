@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 public class SimulationModel {
     private final int[] state;
-    private final String[] reactionIds;
+    private final String[] reactionNames;
     private final double[] reactionRates;
     private final ReactionComponent[] left;
     private final ReactionComponent[] right;
@@ -18,7 +18,7 @@ public class SimulationModel {
                            Map<String,Integer> initialState){
         int size = reactions.size()+1;
 
-        reactionIds = new String[size];
+        reactionNames = new String[size];
         reactionRates = new double[size];
         left = new ReactionComponent[size];
         right = new ReactionComponent[size];
@@ -31,10 +31,11 @@ public class SimulationModel {
             state[speciesMap.get(p)] = initialState.get(p);
         }
 
+        reactionNames[0] = "init";
         int counter = 1;
         setInitAsReactionZero();
         for (Reaction r : reactions){
-            reactionIds[counter] = r.getId();
+            reactionNames[counter] = r.getId();
             reactionRates[counter] = r.getRate();
             left[counter] = new ReactionComponent(r.getReactantsAsIntegerMap(speciesMap));
             right[counter] = new ReactionComponent(r.getProductsAsIntegerMap(speciesMap));
@@ -95,7 +96,7 @@ public class SimulationModel {
     // -----------------------------------------------
 
     private void setInitAsReactionZero(){
-        reactionIds[0] = "init";
+        reactionNames[0] = "init";
         reactionRates[0] = 0;
         left[0] = new ReactionComponent();
         Map<Integer,Integer> reactionZeroRight = new HashMap<>();
@@ -113,7 +114,7 @@ public class SimulationModel {
     public int[] getState() {
         return state;
     }
-    public String[] getReactionIds(){ return reactionIds; }
+    public String[] getReactionNames(){ return reactionNames; }
     public double[] getReactionRates() {
         return reactionRates;
     }
@@ -147,7 +148,7 @@ public class SimulationModel {
     public void printReactions(){
         System.out.println("Model reactions");
         for (int i = 1; i<left.length;i++){
-            System.out.println(i + " - " + reactionIds[i] + " : "
+            System.out.println(i + " - " + reactionNames[i] + " : "
                     + left[i].toString(moleculesList)
                     + "--> "
                     + right[i].toString(moleculesList)
@@ -163,4 +164,6 @@ public class SimulationModel {
         }
         System.out.println();
     }
+
+
 }
