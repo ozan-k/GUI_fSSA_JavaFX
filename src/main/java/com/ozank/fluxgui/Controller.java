@@ -16,7 +16,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
 
 public class Controller implements Initializable {
@@ -237,6 +240,7 @@ public class Controller implements Initializable {
         colorPickerCol.setCellValueFactory(new PropertyValueFactory<FluxReaction, ColorPicker>("colorPicker"));
         fluxReactionsTableView.setItems(fluxReactionsData);
         fluxReactionsTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Label fluxReactionsTitle = new Label("Flux Graph Reactions");
@@ -371,7 +375,37 @@ public class Controller implements Initializable {
                         cutOffValue);
             }
         });
+
+        explortFluxesButton.setOnAction(event -> {
+            //Opening a dialog box
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save");
+            //Set extension filter for text files
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
+            fileChooser.getExtensionFilters().add(extFilter);
+
+            //Show save file dialog
+            File file = fileChooser.showSaveDialog(fluxMoleculesVBox.getScene().getWindow());
+            if (file != null) {
+                // System.out.println(file);
+                saveTextToFile(simulation.allFluxesToJson(),file);
+            }
+
+        });
     }
+
+    private void saveTextToFile(String content, File file) {
+        try {
+            PrintWriter writer;
+            writer = new PrintWriter(file);
+            writer.println(content);
+            writer.close();
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public ObservableList<PlotSpecies> filterPlotSpeciesData(String searchText) {
         ObservableList<PlotSpecies> result = FXCollections.observableArrayList();
@@ -472,13 +506,12 @@ public class Controller implements Initializable {
                 "end time 0.75;\n\n" +
                 "every 2;\n\n" +
                 "//scaling factor 10;\n\n" +
-                "interval 0.25;\n";
+                "interval 0.05;\n";
     }
+
     private double getEndTime(List< TrajectoryState > trajectory){
         return trajectory.get(trajectory.size() - 1).getTime();
     }
-
-    // ========================================================
 
 }
 

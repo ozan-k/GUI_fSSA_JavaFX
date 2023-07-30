@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,7 +37,7 @@ public class SimulationSSA {
     private final double interval;
     private double nextIntervalEnd;
     private final boolean trackIntervals;
-    private final List<Matrix<TripleIndex>> intervalFluxes;
+    private final ArrayList<IntervalFluxSet> intervalFluxes;
     private boolean updateTrajectoryFlag;
 
     public SimulationSSA(SimulationModel model,int every,double interval){
@@ -193,9 +194,9 @@ public class SimulationSSA {
             }
         }
         if (trackIntervals && time > nextIntervalEnd){
+            intervalFluxes.add(new IntervalFluxSet(matrixF_interval,time));
             nextIntervalEnd += interval;
-            intervalFluxes.add(matrixF_interval.copy());
-            matrixF_interval.clear();
+            matrixF_interval = new Matrix<>();
         }
     }
 
@@ -303,11 +304,27 @@ public class SimulationSSA {
         }
     }
 
+    public void printFluxes(Matrix<TripleIndex> m){
+        for (TripleIndex t : m.keySet()){
+            System.out.println(t.toString(model.getMoleculesList()) + " : " + matrixF.get(t));
+        }
+    }
+
+    public void printIntervalFluxes(){
+        for (IntervalFluxSet m : intervalFluxes){
+            System.out.println(m.getTimeStamp());
+            for (TripleIndex t : m.getMatrix().keySet()){
+                System.out.println(t.toString(model.getMoleculesList()) + " : " + matrixF.get(t));
+            }
+            System.out.println();
+        }
+    }
+
     public Matrix<TripleIndex> getMatrixF(){
         return matrixF;
     }
 
-    public List<Matrix<TripleIndex>> getIntervalFluxes(){
+    public List<IntervalFluxSet> getIntervalFluxes(){
         return intervalFluxes;
     }
     public void tester(){
@@ -317,19 +334,46 @@ public class SimulationSSA {
         return model;
     }
 
-    public static HashMap<TripleIndex, GraphEdge> computeFluxGraph(SimulationSSA simulation){
-        HashMap<TripleIndex, GraphEdge> graph = new HashMap<>();
-        for (TripleIndex t : simulation.getF().keySet()) {
-            int sourceId = t.getA();
-            int targetId = t.getB();
-            int moleculeId = t.getC();
-            String moleculeName = simulation.getModel().getMoleculesList().get(moleculeId);
-            String sourceName = simulation.getModel().getReactionNames()[sourceId];
-            String targetName = simulation.getModel().getReactionNames()[targetId];
-            int flux = simulation.getF().get(t);
-            graph.put(t, new GraphEdge(sourceId, targetId, sourceName, targetName, moleculeId, moleculeName, flux));
+    private String matrixToJson(Matrix<TripleIndex> matrix){
+        boolean semafor = false;
+        StringBuilder s = new StringBuilder("[\n\t");
+        for (TripleIndex t : matrix.keySet()){
+            if (semafor) { s.append(", \n\t");}
+            semafor = true;
+            s.append("{\"source\": " + t.getA() + ", ");
+            s.append("\"target\": " + t.getB() + ", ");
+            s.append("\"species\": \"" + model.getMoleculesList().get(t.getC()) + "\", ");
+            s.append("\"flux\": " + matrix.get(t) + "}");
         }
-        return graph;
+        s.append(" ]");
+        return s.toString();
+    }
+
+    private String intervalFluxToJson(IntervalFluxSet fluxSet){
+        StringBuilder s = new StringBuilder("\n{ \"time\": " + fluxSet.getTimeStamp() + ",\n");
+        s.append("  \"fluxes\": " + matrixToJson(fluxSet.getMatrix()) + "}");
+        return s.toString();
+    }
+
+    private String allIntervalFluxesToJson(){
+        boolean semafor = false;
+        StringBuilder s = new StringBuilder("\n\"interval\": [");
+        for (IntervalFluxSet f : intervalFluxes){
+            if (semafor) { s.append(",\n"); }
+            s.append(intervalFluxToJson(f));
+            semafor = true;
+        }
+        s.append("]");
+        return s.toString();
+    }
+
+    public String allFluxesToJson(){
+        StringBuilder s = new StringBuilder("{ \"complete\": ");
+        s.append(matrixToJson(matrixF));
+        s.append(", ");
+        s.append(allIntervalFluxesToJson());
+        s.append("}");
+        return s.toString();
     }
 
 }
