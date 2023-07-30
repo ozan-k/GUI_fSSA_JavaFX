@@ -38,7 +38,7 @@
                                          GridPane.rowIndex="0"/>
                             </GridPane>
                             <Button text="Run" prefWidth="60" onAction="#onRunButtonClick"/>
-                            <Button text="Plot Fluxes" prefWidth="80" onAction="#onFluxButtonClick" fx:id="fluxButton"/>
+                            <Button text="Reset" prefWidth="60" onAction="#onResetButtonClick" fx:id="fluxButton"/>
                             <CheckBox text="Time series" textAlignment="CENTER" selected="true" fx:id="timeSeriesCheckBox"/>
                         </HBox>
                     </top>
@@ -59,11 +59,9 @@
                 </VBox>
             </SplitPane>
             <SplitPane orientation="VERTICAL">
-                <VBox fx:id="completeFluxesVBox">
-                    <CheckBox fx:id="autoLayoutCheckBox" selected="true"/>
+                <VBox fx:id="fluxReactionsVBox">
                 </VBox>
-                <VBox>
-                    <Label text="D"/>
+                <VBox fx:id="fluxMoleculesVBox">
                 </VBox>
             </SplitPane>
 

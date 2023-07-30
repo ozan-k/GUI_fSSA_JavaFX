@@ -2,8 +2,7 @@ module com.ozank.fluxgui {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.swing;
-    requires gs.core;
-    requires gs.ui.javafx;
+    requires smartgraph;
 
     opens com.ozank.viewElements to javafx.fxml;
     opens com.ozank.fluxgui to javafx.fxml;

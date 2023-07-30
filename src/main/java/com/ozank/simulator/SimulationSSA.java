@@ -1,5 +1,7 @@
 package com.ozank.simulator;
 
+import com.ozank.fluxgui.Controller;
+import com.ozank.fluxgui.GraphEdge;
 import com.ozank.fluxgui.ProgressForm;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -207,7 +209,7 @@ public class SimulationSSA {
         }
     };
 
-    public void simulateWithTimeLimit(double endTime,boolean timeSeries)  {
+    public void simulateWithTimeLimit(double endTime, boolean timeSeries, Controller controller)  {
         updateTrajectoryFlag = timeSeries;
         ProgressForm pForm = new ProgressForm();
         Task<Void> task = new Task() {
@@ -229,10 +231,9 @@ public class SimulationSSA {
                         simulationStep();
                     }
                 }
-
                 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 Platform.runLater(() -> {
-                   // ~~~~~~~~~~~~~
+                   controller.initiateFluxControls();
                 });
                 return null;
             }
@@ -314,6 +315,21 @@ public class SimulationSSA {
 
     public SimulationModel getModel(){
         return model;
+    }
+
+    public static HashMap<TripleIndex, GraphEdge> computeFluxGraph(SimulationSSA simulation){
+        HashMap<TripleIndex, GraphEdge> graph = new HashMap<>();
+        for (TripleIndex t : simulation.getF().keySet()) {
+            int sourceId = t.getA();
+            int targetId = t.getB();
+            int moleculeId = t.getC();
+            String moleculeName = simulation.getModel().getMoleculesList().get(moleculeId);
+            String sourceName = simulation.getModel().getReactionNames()[sourceId];
+            String targetName = simulation.getModel().getReactionNames()[targetId];
+            int flux = simulation.getF().get(t);
+            graph.put(t, new GraphEdge(sourceId, targetId, sourceName, targetName, moleculeId, moleculeName, flux));
+        }
+        return graph;
     }
 
 }
