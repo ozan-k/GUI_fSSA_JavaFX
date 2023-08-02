@@ -142,17 +142,6 @@ public class IntervalFluxScene {
         slider.setBlockIncrement(intervalSize);
         slider.setPadding(new Insets(20, 10, 10, 10));
 
-        slider.valueProperty().addListener((obs,old,val)->{
-            double value = (double) val;
-            int lower = (int) (value/ intervalSize);
-            if ((intervalSize /2) < (value - lower * intervalSize)){
-                slider.setValue(intervalSize *(lower+1));
-                updateEdgeWeightsOfIntervalGraph(intervalFluxes.get(lower),graphView, graphEdgeMap, moleculesColorMap,fluxReactions, fluxMolecules);
-            } else {
-                slider.setValue(intervalSize *lower);
-                updateEdgeWeightsOfIntervalGraph(intervalFluxes.get(lower-1),graphView, graphEdgeMap, moleculesColorMap, fluxReactions, fluxMolecules);
-            }
-        });
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
 
@@ -165,7 +154,23 @@ public class IntervalFluxScene {
 
         final int[] intervalState = {0};
 
-
+        slider.valueProperty().addListener((obs,old,val)->{
+            double value = (double) val;
+            int lower = (int) (value/ intervalSize);
+            if ((intervalSize /2) < (value - lower * intervalSize)){
+                slider.setValue(intervalSize *(lower+1));
+                updateEdgeWeightsOfIntervalGraph(intervalFluxes.get(lower),graphView, graphEdgeMap, moleculesColorMap,fluxReactions, fluxMolecules);
+                intervalState[0] = lower;
+                lineChart.removePolygon();
+                lineChart.addPolygon(intervalState[0]*intervalSize,(intervalState[0]+1)*intervalSize,maxSpeciesCount + maxSpeciesCount/10);
+            } else {
+                slider.setValue(intervalSize *lower);
+                updateEdgeWeightsOfIntervalGraph(intervalFluxes.get(lower-1),graphView, graphEdgeMap, moleculesColorMap, fluxReactions, fluxMolecules);
+                intervalState[0] = lower -1;
+                lineChart.removePolygon();
+                lineChart.addPolygon(intervalState[0]*intervalSize,(intervalState[0]+1)*intervalSize,maxSpeciesCount + maxSpeciesCount/10);
+            }
+        });
 
         //lineChart.getData().remove(currentIntervalMarker);
         // https://www.tutorialspoint.com/how-to-color-the-plotted-area-of-a-javafx-xy-chart
