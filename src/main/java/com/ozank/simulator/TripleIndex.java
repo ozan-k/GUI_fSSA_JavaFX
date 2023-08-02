@@ -10,7 +10,7 @@ public class TripleIndex {
     private final int c;
     private int hashCode;
 
-    TripleIndex(int a, int b, int c) {
+    public TripleIndex(int a, int b, int c) {
         this.a = a;
         this.b = b;
         this.c = c;

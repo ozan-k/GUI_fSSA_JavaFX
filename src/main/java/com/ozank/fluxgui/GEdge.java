@@ -2,6 +2,8 @@ package com.ozank.fluxgui;
 
 import com.brunomnsilva.smartgraph.graphview.SmartLabelSource;
 
+import java.util.Objects;
+
 public class GEdge implements Comparable<GEdge>{
     private int weight;
     private int id;
@@ -29,6 +31,10 @@ public class GEdge implements Comparable<GEdge>{
         return weight;
     }
 
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
     public int getId() { return id; }
 
     public String getSpeciesName(){
@@ -39,7 +45,11 @@ public class GEdge implements Comparable<GEdge>{
     public String getDisplayDistance() {
         /* If the above annotation is not present, the toString()
         will be used as the edge label. */
-        return weight + " x " + speciesName;
+        if (weight == 0) {
+            return "";
+        } else {
+            return weight + " x " + speciesName;
+        }
     }
 
     @Override
@@ -53,4 +63,5 @@ public class GEdge implements Comparable<GEdge>{
     public int compareTo(GEdge o) {
         return CharSequence.compare(speciesName, o.getSpeciesName());
     }
+
 }

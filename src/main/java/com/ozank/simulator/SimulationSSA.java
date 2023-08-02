@@ -1,7 +1,6 @@
 package com.ozank.simulator;
 
 import com.ozank.fluxgui.Controller;
-import com.ozank.fluxgui.GraphEdge;
 import com.ozank.fluxgui.ProgressForm;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -12,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -176,7 +174,7 @@ public class SimulationSSA {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         ReactionComponent right = reactionsRight[reactionIndex];
         for (Integer speciesIndex : right.keySet()){
-            matrixM.add(new PairIndex(speciesIndex,reactionIndex),right.get(speciesIndex));
+            matrixM.put(new PairIndex(speciesIndex,reactionIndex),right.get(speciesIndex));
             state_y[speciesIndex] += right.get(speciesIndex);
         }
     }
@@ -248,18 +246,6 @@ public class SimulationSSA {
         thread.start();
     }
 
-    public Matrix<PairIndex> getM(){
-        return matrixM;
-    }
-
-    public Matrix<TripleIndex> getF(){
-        return matrixF;
-    }
-
-    public List<TrajectoryState> getTrajectory() {
-        return trajectory;
-    }
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public void writeToFile(String filePath){
@@ -320,6 +306,10 @@ public class SimulationSSA {
         }
     }
 
+    public List<TrajectoryState> getTrajectory() {
+        return trajectory;
+    }
+
     public Matrix<TripleIndex> getMatrixF(){
         return matrixF;
     }
@@ -327,11 +317,13 @@ public class SimulationSSA {
     public List<IntervalFluxSet> getIntervalFluxes(){
         return intervalFluxes;
     }
-    public void tester(){
-    }
 
     public SimulationModel getModel(){
         return model;
+    }
+
+    public double getInterval() {
+        return interval;
     }
 
     private String matrixToJson(Matrix<TripleIndex> matrix){

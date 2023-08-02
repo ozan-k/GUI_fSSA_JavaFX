@@ -2,24 +2,23 @@ package com.ozank.fluxgui;
 
 import com.ozank.lexerParser.ModelBuilder;
 import com.ozank.simulator.*;
-import com.ozank.viewElements.FluxSpecies;
-import com.ozank.viewElements.FluxReaction;
-import com.ozank.viewElements.PlotSpecies;
+import com.ozank.viewElements.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.chart.LineChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.*;
 
 public class Controller implements Initializable {
@@ -48,6 +47,8 @@ public class Controller implements Initializable {
 
     @FXML
     private VBox fluxMoleculesVBox;
+
+    private String timeSeriesUnitText = "";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -83,7 +84,6 @@ public class Controller implements Initializable {
             displayPlotParticipantsAndSelect();
             simulation.simulateWithTimeLimit(builder.getEndTime(),true,this);
         } else {
-            displayPlotParticipantsAndSelect();
             simulation.simulateWithTimeLimit(builder.getEndTime(),false,this);
         }
     }
@@ -185,15 +185,16 @@ public class Controller implements Initializable {
                     : endTimeTextField.getText() );
 
             if (checkPlotBeginEnd(startTimeString,endTimeString)) {
-                String timeUnit = (plotTimeUnitTextField.getText().isEmpty() ? "" :
+                timeSeriesUnitText = (plotTimeUnitTextField.getText().isEmpty() ? "" :
                         " (" + plotTimeUnitTextField.getText() + ")");
-                PlotScene pScene = new PlotScene(speciesMap,
+                LineChartFactory lineChartFactory = new LineChartFactory(speciesMap,
                         PlotSpecies.getPlotSpecies(),
                         PlotSpecies.getColorMap(),
-                        timeUnit,
+                        timeSeriesUnitText,
                         simulation.getTrajectory(),
                         Double.parseDouble(startTimeString),
                         Double.parseDouble(endTimeString));
+                PlotScene pScene = new PlotScene(lineChartFactory.getLineChart());
             }
         });
 
@@ -252,9 +253,13 @@ public class Controller implements Initializable {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+        String[] colors = {"#fd7f6f", "#7eb0d5", "#b2e061", "#bd7ebe", "#ffb55a", "#ffee65", "#beb9db", "#fdcce5", "#8bd3c7"};
+        int k = 0;
         for (String name : speciesMap.keySet()) {
-            fluxSpeciesData.add(new FluxSpecies(name,"#9BD087"));
+            fluxSpeciesData.add(new FluxSpecies(name,colors[k % 9]));
+            k++;
         }
+
         FXCollections.sort(fluxSpeciesData);
         TableView fluxMoleculesTableView = new TableView<>();
         TableColumn plotColFluxMolecules = new TableColumn("Include");
@@ -311,12 +316,12 @@ public class Controller implements Initializable {
         plotCompleteFluxGraphButton.setMaxWidth(Double.MAX_VALUE);
         Button plotIntervalFluxGraphButton = new Button("Interval Flux Graph");
         plotIntervalFluxGraphButton.setMaxWidth(Double.MAX_VALUE);
-        Button explortFluxesButton = new Button("Export");
-        explortFluxesButton.setMaxWidth(Double.MAX_VALUE);
+        Button exportFluxesButton = new Button("Export");
+        exportFluxesButton.setMaxWidth(Double.MAX_VALUE);
 
         fluxControls.add(plotCompleteFluxGraphButton,0,0);
         fluxControls.add(plotIntervalFluxGraphButton,1,0);
-        fluxControls.add(explortFluxesButton,2,0);
+        fluxControls.add(exportFluxesButton,2,0);
         fluxControls.setHgap(5);
         fluxControls.setPadding(new Insets(1, 1, 1, 1));
 
@@ -348,25 +353,8 @@ public class Controller implements Initializable {
         });
 
         plotCompleteFluxGraphButton.setOnAction(event -> {
-           // System.out.println(FluxSpecies.getFluxGraphSpecies().getClass());
-            String cutOffString = allCutOffTextField.getText();
-            boolean semafor =false;
-            int cutOffValue = 0;
-            if (isInteger(cutOffString)){
-                cutOffValue = Integer.parseInt(cutOffString);
-                semafor = true;
-            } else {
-                if (cutOffString.equals("")){
-                    semafor = true;
-                } else {
-                    Alert a = new Alert(Alert.AlertType.NONE);
-                    a.setAlertType(Alert.AlertType.WARNING);
-                    a.setContentText("\"" + cutOffString + "\"" + "is not an integer. "+
-                            "Cut-off value must be a positive integer.");
-                    a.show();
-                }
-            }
-            if (semafor) {
+            int cutOffValue = checkAllCutOffTextField(allCutOffTextField.getText());
+            if (cutOffValue >= 0) {
                 fluxScene.draw(FluxSpecies.getFluxGraphSpecies(),
                         FluxReaction.getFluxReactions(),
                         FluxSpecies.getColorMap(),
@@ -376,7 +364,31 @@ public class Controller implements Initializable {
             }
         });
 
-        explortFluxesButton.setOnAction(event -> {
+        plotIntervalFluxGraphButton.setOnAction(event -> {
+            IntervalFluxScene intervalFluxScene = new IntervalFluxScene(simulation);
+            LineChartFactory lineChartFactory = new LineChartFactory(
+                    speciesMap,
+                    FluxSpecies.getFluxGraphSpecies(),
+                    FluxSpecies.getColorMap(),
+                    timeSeriesUnitText,
+                    simulation.getTrajectory(),0,
+                    getEndTime(simulation.getTrajectory()));
+            MyLineChart lineChart = ( timeSeriesCheckBox.isSelected() ?
+                    lineChartFactory.getLineChart() : null);
+            int cutOffValue = checkAllCutOffTextField(allCutOffTextField.getText());
+            if (cutOffValue >= 0) {
+                intervalFluxScene.draw(FluxSpecies.getFluxGraphSpecies(),
+                        FluxReaction.getFluxReactions(),
+                        FluxSpecies.getColorMap(),
+                        FluxReaction.getColorMap(),
+                        FluxSpecies.getCutOffMap(),
+                        cutOffValue,
+                        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        lineChart);
+            }
+        });
+
+        exportFluxesButton.setOnAction(event -> {
             //Opening a dialog box
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save");
@@ -511,6 +523,23 @@ public class Controller implements Initializable {
 
     private double getEndTime(List< TrajectoryState > trajectory){
         return trajectory.get(trajectory.size() - 1).getTime();
+    }
+
+    private int checkAllCutOffTextField(String cutOffString){
+        if (isInteger(cutOffString)){
+            return Integer.parseInt(cutOffString);
+        } else {
+            if (cutOffString.equals("")){
+                return 0;
+            } else {
+                Alert a = new Alert(Alert.AlertType.NONE);
+                a.setAlertType(Alert.AlertType.WARNING);
+                a.setContentText("\"" + cutOffString + "\"" + "is not an integer. "+
+                        "Cut-off value must be a positive integer.");
+                a.show();
+                return -1;
+            }
+        }
     }
 
 }

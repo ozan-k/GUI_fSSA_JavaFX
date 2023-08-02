@@ -82,7 +82,6 @@ public class MyZoomContainer extends BorderPane {
         slider.valueProperty().bind(this.scaleFactorProperty());
 
         exportButton.setOnAction(event -> {
-
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save");
             //Set extension filter for text files
@@ -90,7 +89,7 @@ public class MyZoomContainer extends BorderPane {
             fileChooser.getExtensionFilters().addAll(extFilter);
 
             //Show save file dialog
-            File file = fileChooser.showSaveDialog(content.getScene().getWindow());
+            File file = fileChooser.showSaveDialog(this.getScene().getWindow());
             if (file != null) {
                 String fileName = file.getName();
                 String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1, file.getName().length()).toLowerCase();
@@ -104,9 +103,6 @@ public class MyZoomContainer extends BorderPane {
                     }
                 }
             }
-
-
-
         });
 
         return paneSlider;

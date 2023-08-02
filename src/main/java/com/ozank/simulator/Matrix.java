@@ -1,5 +1,6 @@
 package com.ozank.simulator;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class Matrix<T> {
         int value = matrix.getOrDefault(p,0);
         matrix.put(p, value+1);
     }
-    public void add(T p,int addedValue){
+    public void put(T p, int addedValue){
         int value = matrix.getOrDefault(p,0);
         matrix.put(p, value + addedValue);
     }
@@ -58,7 +59,7 @@ public class Matrix<T> {
 
     public void matrixAddition(Matrix<T> otherMatrix){
         for (T index : otherMatrix.keySet()){
-            add(index,otherMatrix.get(index));
+            put(index,otherMatrix.get(index));
         }
     }
 
@@ -89,6 +90,10 @@ public class Matrix<T> {
 
     public Set<T> keySet(){
         return matrix.keySet();
+    }
+
+    public int maxValue(){
+        return Collections.max(matrix.values());
     }
 
     public void printMatrix(){
