@@ -114,18 +114,20 @@ public class IntervalFluxScene {
             SmartStylableNode stylableEdge = graphView.getStylableEdge(edge);
             Color color = moleculesColorMap.get(edge.getSpeciesName());
             updateEdgeWeight(stylableEdge, color, edgeWeight);
+            String edgeStyle = "-fx-stroke-width: " + mapFluxesToWidths(edgeWeight) +
+                    "; -fx-stroke: " + FluxDigraphData.toRGBCode(color) +";";
 
-            String edgeStyle = "-fx-stroke: " + FluxDigraphData.toRGBCode(color) +";";
 
             if (stylableEdge instanceof SmartGraphEdgeLine<?,?>){
                 SmartGraphEdgeLine edgeLine = (SmartGraphEdgeLine) stylableEdge;
                 SmartArrow stylableArrow = edgeLine.getAttachedArrow();
-                stylableArrow.setStyle(edgeStyle);
+                updateEdgeArrow(stylableArrow,edgeWeight,edgeStyle);
             }
             if (stylableEdge instanceof SmartGraphEdgeCurve<?,?>){
                 SmartGraphEdgeCurve edgeCurve = (SmartGraphEdgeCurve) stylableEdge;
                 SmartArrow stylableArrow = edgeCurve.getAttachedArrow();
-                stylableArrow.setStyle(edgeStyle);
+                updateEdgeArrow(stylableArrow,edgeWeight,edgeStyle);
+
             }
         }
 
@@ -372,7 +374,7 @@ public class IntervalFluxScene {
         if (fluxValue == 0){
             return 0;
         }
-        int window = (maxFluxWeight+1)/10;
+        int window = ((maxFluxWeight+1)/10 == 0 ? 1 : (maxFluxWeight+1)/10);
         return (fluxValue/window)+1;
     }
 
