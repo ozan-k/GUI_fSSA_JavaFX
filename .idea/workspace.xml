@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5c812653-46c1-4ab3-939c-611c92d77ea7" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ozank/dataElements/FluxData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ozank/dataElements/FluxItem.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ozank/dataElements/ProcessedFluxes.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ozank/dataElements/TimeSeries.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxLegend.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/legend.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/CompleteFluxScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/CompleteFluxScene.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/Controller.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/GEdge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/GEdge.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/GraphEdge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/GraphEdge.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/IntervalFluxScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/IntervalFluxScene.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/IntervalFluxSceneBU.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/PlotScene.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/fluxgui/PlotScene.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/lexerParser/ModelBuilder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/DependentReactions.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/IntervalFluxSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/dataElements/IntervalFluxSet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/Matrix.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/dataElements/Matrix.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/PairIndex.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/Reaction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/ReactionComponent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/SimulationModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/SimulationSSA.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/TrajectoryState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/TrajectoryState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/simulator/TripleIndex.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/TripleIndex.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FilteredGraph.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FilteredGraph.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxDigraphData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxDigraphData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxGraph.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxGraph.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxReaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxReaction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxSpecies.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/FluxSpecies.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/LineChartFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ozank/viewElements/LineChartFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/ozank/fluxgui/view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/ozank/fluxgui/view.fxml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2oki4TxzoeXiBUVIVnpxB1InzYR" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "Maven.FluxGUI_JavaFX [clean].executor": "Run",
+    "Maven.FluxGUI_JavaFX [compile].executor": "Run",
+    "Maven.FluxGUI_JavaFX [install].executor": "Run",
+    "Maven.FluxGUI_JavaFX [org.apache.maven.plugins:maven-clean-plugin:2.5:clean].executor": "Run",
+    "Maven.FluxGUI_JavaFX [org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile].executor": "Run",
+    "Maven.FluxGUI_JavaFX [org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy].executor": "Run",
+    "Maven.FluxGUI_JavaFX [package].executor": "Run",
+    "Maven.FluxGUI_JavaFX [site].executor": "Run",
+    "Maven.FluxGUI_JavaFX [test].executor": "Run",
+    "Maven.FluxGUI_JavaFX [validate].executor": "Run",
+    "Maven.FluxGUI_JavaFX [verify].executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/ozan/My/Current/Flux_CRN_etc/FluxVisGUI_JavaFX/src/main/resources/com/ozank/fluxgui",
+    "project.structure.last.edited": "Global Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.27005348",
+    "settings.editor.selected.configurable": "settings.sync"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/com/ozank/fluxgui" />
+      <recent name="$PROJECT_DIR$/src/main/resources" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Main">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="19" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="com.ozank.fluxgui.Main" />
+      <module name="FluxGUI_JavaFX" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.ozank.fluxgui.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FluxGUI_JavaFX [package]" type="MavenRunConfiguration" factoryName="Maven" temporary="true">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="cmdOptions" />
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="package" />
+                <option value="-Pfatjar" />
+              </list>
+            </option>
+            <option name="multimoduleDir" />
+            <option name="pomFileName" value="pom.xml" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Maven.FluxGUI_JavaFX [package]" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Maven.FluxGUI_JavaFX [package]" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5c812653-46c1-4ab3-939c-611c92d77ea7" name="Changes" comment="" />
+      <created>1731419782971</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1731419782971</updated>
+    </task>
+    <servers />
+  </component>
+</project>

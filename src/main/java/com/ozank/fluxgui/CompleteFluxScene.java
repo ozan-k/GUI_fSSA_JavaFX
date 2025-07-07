@@ -2,11 +2,9 @@ package com.ozank.fluxgui;
 
 import com.brunomnsilva.smartgraph.graph.*;
 import com.brunomnsilva.smartgraph.graphview.*;
-import com.ozank.simulator.SimulationSSA;
-import com.ozank.simulator.TripleIndex;
-import com.ozank.viewElements.FilteredGraph;
-import com.ozank.viewElements.FluxDigraphData;
-import com.ozank.viewElements.FluxGraph;
+import com.ozank.dataElements.FluxData;
+import com.ozank.dataElements.ProcessedFluxes;
+import com.ozank.viewElements.*;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
@@ -21,13 +19,15 @@ import java.util.*;
 public class CompleteFluxScene {
     private final HashMap<TripleIndex, GraphEdge> graph;
     private final Set<GReaction> allReactions;
-    private int maxFluxWeight = 0;
+    private long maxFluxWeight = 0L;
+    private final HashMap<Integer,String> reactionStrings;
 
-    public CompleteFluxScene(SimulationSSA simulation) {
-        FluxGraph data = new FluxGraph(simulation.getMatrixF(),simulation.getModel());
+    public CompleteFluxScene(ProcessedFluxes fluxes,Map<String,Integer> speciesMap) {
+        FluxGraph data = new FluxGraph(fluxes.getMatrixF(),speciesMap);
         graph = data.getGraph();
         allReactions = data.getAllReactions();
-        maxFluxWeight = simulation.getMatrixF().maxValue();
+        maxFluxWeight = fluxes.getMatrixF().maxValue();
+        reactionStrings = fluxes.getReactions();
     }
 
     public void draw(HashSet<String> fluxMolecules,
@@ -68,7 +68,7 @@ public class CompleteFluxScene {
             graphView.getStylableVertex(vertexMap.get(id)).setStyle(style);
         }
 
-        int edgeWeight;
+        long edgeWeight;
         for (GEdge edge : graphEdges) {
             edgeWeight = edge.getWeight();
             Color c = moleculesColorMap.get(edge.getSpeciesName());
@@ -116,18 +116,24 @@ public class CompleteFluxScene {
                 graphView.setVertexPosition(vertexMap.get(id),xPosition,newYPosition);
             }
         });
+
+        FluxLegend fluxLegend = new FluxLegend(maxFluxWeight);
+
+        fluxStage.setOnCloseRequest(event -> {
+            fluxLegend.close();
+        });
+
     }
 
     public Set<GReaction> getAllReactions(){
         return allReactions;
     }
 
-    private int mapFluxesToWidths(int fluxValue){
+    private int mapFluxesToWidths(long fluxValue){
         if (fluxValue == 0){
             return 0;
         }
-        int window = (maxFluxWeight+1)/10;
-        return (fluxValue/window)+1;
+        long window = (maxFluxWeight+1)/10;
+        return (int) (fluxValue/window)+1;
     }
-
 }

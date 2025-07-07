@@ -7,7 +7,7 @@ public class GraphEdge implements Comparable<GraphEdge> {
     private String targetName;
     private int speciesId;
     private String speciesName;
-    private int flux;
+    private long flux;
 
 
     public GraphEdge(int sourceId,
@@ -16,7 +16,7 @@ public class GraphEdge implements Comparable<GraphEdge> {
                      String targetName,
                      int speciesId,
                      String speciesName,
-                     int flux) {
+                     long flux) {
         this.sourceId = sourceId;
         this.targetId = targetId;
         this.sourceName = sourceName;
@@ -50,7 +50,7 @@ public class GraphEdge implements Comparable<GraphEdge> {
         return speciesName;
     }
 
-    public int getFlux() {
+    public long getFlux() {
         return flux;
     }
 
@@ -69,8 +69,8 @@ public class GraphEdge implements Comparable<GraphEdge> {
 
     @Override
     public int compareTo(GraphEdge o) {
-        int v1 = Math.abs(this.flux);
-        int v2 = Math.abs(o.getFlux());
+        long v1 = Math.abs(this.flux);
+        long v2 = Math.abs(o.getFlux());
         if (v1>v2){
             return -1;
         } else if (v2> v1) {
@@ -84,7 +84,7 @@ public class GraphEdge implements Comparable<GraphEdge> {
     public int hashCode() {
         return sourceId * sourceName.hashCode() +
                 targetId * targetName.hashCode() +
-                speciesId * speciesName.hashCode() + flux;
+                speciesId * speciesName.hashCode();
     }
 
     @Override

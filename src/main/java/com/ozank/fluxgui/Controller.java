@@ -1,7 +1,9 @@
 package com.ozank.fluxgui;
 
-import com.ozank.lexerParser.ModelBuilder;
-import com.ozank.simulator.*;
+import com.google.gson.Gson;
+import com.ozank.dataElements.FluxData;
+import com.ozank.dataElements.ProcessedFluxes;
+import com.ozank.dataElements.TimeSeries;
 import com.ozank.viewElements.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,38 +11,34 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.chart.LineChart;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+
+import java.io.*;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
 
 public class Controller implements Initializable {
-    SimulationSSA simulation;
     Map<String,Integer> speciesMap;
-    //List<String> modelSpecies;
+    ProcessedFluxes fluxes;
+    TimeSeries timeSeries;
 
     ObservableList<PlotSpecies> plotSpeciesData = FXCollections.observableArrayList();
     ObservableList<FluxSpecies> fluxSpeciesData = FXCollections.observableArrayList();
     ObservableList<FluxReaction> fluxReactionsData = FXCollections.observableArrayList();
 
-    @FXML
-    private TextArea modelCodeArea;
+    Button plotButton;
+    Button plotCompleteFluxGraphButton;
+    Button plotIntervalFluxGraphButton;
 
+    private  String[] colors = {"#fd7f6f", "#7eb0d5", "#98D087", "#bd7ebe", "#ffb55a", "#00C6CF", "#beb9db", "#fdcce5", "#417285"};
     @FXML
-    private Spinner fontSpinner;
-
-    @FXML
-    private VBox plotSelectVBox;
-
-    @FXML
-    private CheckBox timeSeriesCheckBox;
+    private HBox controlHBox;
 
     @FXML
     private VBox fluxReactionsVBox;
@@ -48,197 +46,94 @@ public class Controller implements Initializable {
     @FXML
     private VBox fluxMoleculesVBox;
 
-    private String timeSeriesUnitText = "";
+    @FXML
+    private Button resetButton;
+
+    @FXML
+    private Button openButton;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        modelCodeArea.setStyle("-fx-font-size:10pt;");
-        fontSpinner.valueProperty().addListener((obs,old,newFontValue)->
-                modelCodeArea.setStyle("-fx-font-size: " + newFontValue.toString() + "pt;"));
-        modelCodeArea.setText(getSampleModel());
-    }
-
-    private void reset(){
-        speciesMap = null;
-        simulation = null;
-        plotSpeciesData = FXCollections.observableArrayList();
-        fluxReactionsData = FXCollections.observableArrayList();
-        fluxSpeciesData = FXCollections.observableArrayList();
-        plotSelectVBox.getChildren().clear();
-        fluxReactionsVBox.getChildren().clear();
-        fluxMoleculesVBox.getChildren().clear();
-        PlotSpecies.clearColorMap();
+        resetButton.setDisable(true);
     }
 
     @FXML
-    protected void onRunButtonClick() throws InterruptedException {
-        reset();
-        String model_code = modelCodeArea.getText();
-        ModelBuilder builder = new ModelBuilder(model_code);
-        SimulationModel model = new SimulationModel(builder.getReactions(),builder.getInitialState());
-        int every = builder.getEvery();
-        double interval = builder.getInterval();
-        simulation = new SimulationSSA(model,every,interval);
-        speciesMap = model.getSpeciesMap();
-        if (timeSeriesCheckBox.isSelected()) {
-            displayPlotParticipantsAndSelect();
-            simulation.simulateWithTimeLimit(builder.getEndTime(),true,this);
-        } else {
-            simulation.simulateWithTimeLimit(builder.getEndTime(),false,this);
-        }
+    protected void onOpenButtonClick() throws IOException {
+            //Opening a dialog box
+            resetButton.setDisable(false);
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open");
+            //Set extension filter for text files
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Flux files (*.json)", "*.json");
+            fileChooser.getExtensionFilters().add(extFilter);
+            //Show save file dialog
+            File file = fileChooser.showOpenDialog(controlHBox.getScene().getWindow());
+            if (file != null) {
+                String filePath = file.getAbsolutePath();
+                Gson gson = new Gson();
+                // Read JSON from a file
+                try (Reader reader = new FileReader(filePath)) {
+                    FluxData fluxData = gson.fromJson(reader, FluxData.class);
+                    timeSeries = new TimeSeries(fluxData.getTimeSeries());
+                    speciesMap = timeSeries.getSpeciesMap();
+                    configurePlotParticipants();
+                    fluxes = new ProcessedFluxes(fluxData.getFluxes(),fluxData.getReactions(),speciesMap);
+                    initiateFluxControls();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            openButton.setDisable(true);
     }
 
     @FXML
-    protected void onResetButtonClick() {
+    protected void onResetButtonClick() throws InterruptedException {
         reset();
-        modelCodeArea.setText(getSampleModel());
     }
 
-    private void displayPlotParticipantsAndSelect() {
+    private void configurePlotParticipants() {
         // https://www.heavy.ai/blog/12-color-palettes-for-telling-better-stories-with-your-data
-        String[] colors = {"#fd7f6f", "#7eb0d5", "#b2e061", "#bd7ebe", "#ffb55a", "#ffee65", "#beb9db", "#fdcce5", "#8bd3c7"};
+
         int k = 0;
         for (String name : speciesMap.keySet()) {
             plotSpeciesData.add(new PlotSpecies(name,colors[k % 9]));
             k++;
         }
         FXCollections.sort(plotSpeciesData);
-        TableView tableView = new TableView<>();
-        TableColumn plotCol = new TableColumn("Include");
-        TableColumn nameCol = new TableColumn("Name");
-        TableColumn colorPickerCol = new TableColumn("Color");
-        plotCol.setPrefWidth(75);
-        plotCol.setResizable(false);
-        colorPickerCol.setPrefWidth(120);
-        colorPickerCol.setResizable(false);
-        tableView.getColumns().addAll(plotCol, nameCol, colorPickerCol);
-        plotCol.setCellValueFactory(new PropertyValueFactory<PlotSpecies, ComboBox<String>>("choiceComboBox"));
-        nameCol.setCellValueFactory(new PropertyValueFactory<PlotSpecies, String>("name"));
-        colorPickerCol.setCellValueFactory(new PropertyValueFactory<PlotSpecies, ColorPicker>("colorPicker"));
-        tableView.setItems(plotSpeciesData);
-        tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        GridPane controls = new GridPane();
-        controls.setPadding(new Insets(1, 1, 1, 1));
-        TextField searchTextField = new TextField();
-        Button plotButton = new Button("Plot");
-        plotButton.prefWidth(60);
-        Button exportButton = new Button("Export");
-        exportButton.prefWidth(60);
-
-        searchTextField.setPromptText("Search");
-        controls.add(searchTextField,0,0);
-        controls.add(plotButton,1,0);
-        controls.add(exportButton,2,0);
-        controls.setHgap(5);
-
-        ColumnConstraints column1 = new ColumnConstraints();
-        column1.setFillWidth(true);
-        column1.setHgrow(Priority.ALWAYS);
-        ColumnConstraints column2 = new ColumnConstraints();
-        column2.setFillWidth(true);
-        ColumnConstraints column3 = new ColumnConstraints();
-        column3.setFillWidth(true);
-        controls.getColumnConstraints().addAll(column1, column2, column3);
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        GridPane plotControls = new GridPane();
-        TextField plotTimeUnitTextField = new TextField();
-        TextField startTimeTextField = new TextField();
-        TextField endTimeTextField = new TextField();
-
-        plotTimeUnitTextField.setPromptText("Plot time unit");
-        startTimeTextField.setPromptText("Plot start time");
-        endTimeTextField.setPromptText("Plot end time");
-        plotControls.add(plotTimeUnitTextField,0,0);
-        plotControls.add(startTimeTextField,1,0);
-        plotControls.add(endTimeTextField,2,0);
-        plotControls.setHgap(5);
-        plotControls.setPadding(new Insets(1, 1, 1, 1));
-
-        ColumnConstraints column4 = new ColumnConstraints();
-        column4.setFillWidth(true);
-        column4.setHgrow(Priority.ALWAYS);
-        ColumnConstraints column5 = new ColumnConstraints();
-        column5.setFillWidth(true);
-        column5.setHgrow(Priority.ALWAYS);
-        ColumnConstraints column6 = new ColumnConstraints();
-        column6.setFillWidth(true);
-        column6.setHgrow(Priority.ALWAYS);
-        plotControls.getColumnConstraints().addAll(column4, column5, column6);
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        Label moleculesTitle = new Label("Plot Species");
-        plotSelectVBox.setAlignment(Pos.CENTER);
-        plotSelectVBox.getChildren().addAll(controls,moleculesTitle, tableView,plotControls);
-
-        plotButton.setOnAction(event -> {
-            //System.out.println(ModelSpecies.getPlotModelSpecies());
-            //System.out.println(speciesMap.keySet());
-            double endTime = getEndTime(simulation.getTrajectory());
-            String startTimeString = (startTimeTextField.getText().isEmpty() ?
-                            "0" : startTimeTextField.getText() );
-            String endTimeString = (endTimeTextField.getText().isEmpty() ?
-                    Double.toString(endTime)
-                    : endTimeTextField.getText() );
-
-            if (checkPlotBeginEnd(startTimeString,endTimeString)) {
-                timeSeriesUnitText = (plotTimeUnitTextField.getText().isEmpty() ? "" :
-                        " (" + plotTimeUnitTextField.getText() + ")");
-                LineChartFactory lineChartFactory = new LineChartFactory(speciesMap,
-                        PlotSpecies.getPlotSpecies(),
-                        PlotSpecies.getColorMap(),
-                        timeSeriesUnitText,
-                        simulation.getTrajectory(),
-                        Double.parseDouble(startTimeString),
-                        Double.parseDouble(endTimeString));
-                PlotScene pScene = new PlotScene(lineChartFactory.getLineChart());
-            }
-        });
-
-        searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            tableView.setItems(filterPlotSpeciesData(newValue));
-        });
-
-        exportButton.setOnAction(event -> {
-                //Opening a dialog box
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("Save");
-                //Set extension filter for text files
-                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TSV files (*.tsv)", "*.tsv");
-                fileChooser.getExtensionFilters().add(extFilter);
-
-                //Show save file dialog
-                File file = fileChooser.showSaveDialog(plotSelectVBox.getScene().getWindow());
-                if (file != null) {
-                    // System.out.println(file);
-                    simulation.writeToFile(file.toString());
-                }
-        });
     }
 
+
     public void initiateFluxControls(){
-        CompleteFluxScene fluxScene = new CompleteFluxScene(simulation);
+        CompleteFluxScene fluxScene = new CompleteFluxScene(fluxes,speciesMap);
         for (GReaction gReaction : fluxScene.getAllReactions()) {
-            fluxReactionsData.add(new FluxReaction(gReaction.getId(),gReaction.getName(),"#B1DFF7"));
+            String reaction = fluxes.getReactions().get(gReaction.getId()).replaceFirst("~.*","");
+            String rate = fluxes.getReactions().get(gReaction.getId()).replaceFirst(".*~ rate: ","");
+            fluxReactionsData.add(new FluxReaction(gReaction.getId(),gReaction.getName(),"#B1DFF7",reaction,rate));
         }
+
         FXCollections.sort(fluxReactionsData);
         TableView fluxReactionsTableView = new TableView<>();
         TableColumn plotCol = new TableColumn("Include");
-        //TableColumn idCol = new TableColumn("Id");
-        TableColumn nameCol = new TableColumn("Name");
+        TableColumn nameCol = new TableColumn("Id");
         TableColumn colorPickerCol = new TableColumn("Color");
+        TableColumn reactionCol = new TableColumn("Reaction");
+        TableColumn rateCol = new TableColumn("Rate");
+
         plotCol.setPrefWidth(75);
         plotCol.setResizable(false);
         colorPickerCol.setPrefWidth(120);
         colorPickerCol.setResizable(false);
-        fluxReactionsTableView.getColumns().addAll(plotCol, nameCol, colorPickerCol);
+        reactionCol.setPrefWidth(300);
+        reactionCol.setResizable(true);
+        reactionCol.setPrefWidth(100);
+        reactionCol.setResizable(true);
+        fluxReactionsTableView.getColumns().addAll(plotCol, nameCol, colorPickerCol,reactionCol,rateCol);
         plotCol.setCellValueFactory(new PropertyValueFactory<FluxReaction, ComboBox<String>>("choiceComboBox"));
-        //idCol.setCellValueFactory(new PropertyValueFactory<FluxReaction, String>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<FluxReaction, String>("name"));
         colorPickerCol.setCellValueFactory(new PropertyValueFactory<FluxReaction, ColorPicker>("colorPicker"));
+        reactionCol.setCellValueFactory(new PropertyValueFactory<FluxReaction, String>("reaction"));
+        rateCol.setCellValueFactory(new PropertyValueFactory<FluxReaction, String>("rate"));
+
         fluxReactionsTableView.setItems(fluxReactionsData);
         fluxReactionsTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
@@ -249,11 +144,11 @@ public class Controller implements Initializable {
         fluxReactionsSearchTextField.setPromptText("Search");
         fluxReactionsVBox.setAlignment(Pos.CENTER);
         fluxReactionsVBox.getChildren().addAll(fluxReactionsTitle, fluxReactionsSearchTextField,fluxReactionsTableView);
+        fluxReactionsTableView.prefHeightProperty().bind(fluxReactionsVBox.heightProperty().multiply(0.94));
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        String[] colors = {"#fd7f6f", "#7eb0d5", "#b2e061", "#bd7ebe", "#ffb55a", "#ffee65", "#beb9db", "#fdcce5", "#8bd3c7"};
         int k = 0;
         for (String name : speciesMap.keySet()) {
             fluxSpeciesData.add(new FluxSpecies(name,colors[k % 9]));
@@ -280,7 +175,7 @@ public class Controller implements Initializable {
         fluxCutOffColFluxMolecules.setCellValueFactory(new PropertyValueFactory<PlotSpecies, Spinner<Integer>>("cutOffSpinner"));
         fluxMoleculesTableView.setItems(fluxSpeciesData);
         fluxMoleculesTableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-
+        fluxMoleculesTableView.prefHeightProperty().bind(fluxReactionsVBox.heightProperty().multiply(0.94));
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         GridPane fluxMoleculesControls = new GridPane();
@@ -311,36 +206,16 @@ public class Controller implements Initializable {
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        GridPane fluxControls = new GridPane();
-        Button plotCompleteFluxGraphButton = new Button("Flux Graph");
-        plotCompleteFluxGraphButton.setMaxWidth(Double.MAX_VALUE);
-        Button plotIntervalFluxGraphButton = new Button("Interval Flux Graph");
-        plotIntervalFluxGraphButton.setMaxWidth(Double.MAX_VALUE);
-        Button exportFluxesButton = new Button("Export");
-        exportFluxesButton.setMaxWidth(Double.MAX_VALUE);
-
-        fluxControls.add(plotCompleteFluxGraphButton,0,0);
-        fluxControls.add(plotIntervalFluxGraphButton,1,0);
-        fluxControls.add(exportFluxesButton,2,0);
-        fluxControls.setHgap(5);
-        fluxControls.setPadding(new Insets(1, 1, 1, 1));
-
-        ColumnConstraints column4 = new ColumnConstraints();
-        column4.setFillWidth(true);
-        column4.setHgrow(Priority.ALWAYS);
-        ColumnConstraints column5 = new ColumnConstraints();
-        column5.setFillWidth(true);
-        column5.setHgrow(Priority.ALWAYS);
-        ColumnConstraints column6 = new ColumnConstraints();
-        column6.setFillWidth(true);
-        column6.setHgrow(Priority.ALWAYS);
-        fluxControls.getColumnConstraints().addAll(column4, column5, column6);
+        plotButton = new Button("Plot");
+        plotCompleteFluxGraphButton = new Button("Flux Graph");
+        plotIntervalFluxGraphButton = new Button("Interval Flux Graph");
+        controlHBox.getChildren().addAll(plotButton,plotCompleteFluxGraphButton,plotIntervalFluxGraphButton);
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Label fluxMoleculesTitle = new Label("Flux Graph Species");
         fluxMoleculesVBox.setAlignment(Pos.CENTER);
-        fluxMoleculesVBox.getChildren().addAll(fluxMoleculesTitle, fluxMoleculesControls,fluxMoleculesTableView,fluxControls);
+        fluxMoleculesVBox.getChildren().addAll(fluxMoleculesTitle, fluxMoleculesControls,fluxMoleculesTableView);
 
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -350,6 +225,18 @@ public class Controller implements Initializable {
 
         fluxMoleculesSearchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             fluxMoleculesTableView.setItems(filterFluxSepeciesData(newValue));
+        });
+
+        plotButton.setOnAction(event -> {
+            LineChartFactory lineChartFactory = new LineChartFactory(
+                    speciesMap,
+                    FluxSpecies.getFluxGraphSpecies(),
+                    FluxSpecies.getColorMap(),
+                    "",
+                    timeSeries.getTimeSeries(),0,
+                    timeSeries.getEndTime());
+            MyLineChart lineChart = lineChartFactory.getLineChart();
+            new PlotScene(lineChart);
         });
 
         plotCompleteFluxGraphButton.setOnAction(event -> {
@@ -365,17 +252,18 @@ public class Controller implements Initializable {
         });
 
         plotIntervalFluxGraphButton.setOnAction(event -> {
-            IntervalFluxScene intervalFluxScene = new IntervalFluxScene(simulation);
+            IntervalFluxScene intervalFluxScene = new IntervalFluxScene(fluxes,timeSeries,speciesMap);
+
             LineChartFactory lineChartFactory = new LineChartFactory(
                     speciesMap,
                     FluxSpecies.getFluxGraphSpecies(),
                     FluxSpecies.getColorMap(),
-                    timeSeriesUnitText,
-                    simulation.getTrajectory(),0,
-                    getEndTime(simulation.getTrajectory()));
-            MyLineChart lineChart = ( timeSeriesCheckBox.isSelected() ?
-                    lineChartFactory.getLineChart() : null);
+                    "",
+                    timeSeries.getTimeSeries(),0,
+                    timeSeries.getEndTime());
+            MyLineChart lineChart = lineChartFactory.getLineChart();
             int cutOffValue = checkAllCutOffTextField(allCutOffTextField.getText());
+
             if (cutOffValue >= 0) {
                 intervalFluxScene.draw(FluxSpecies.getFluxGraphSpecies(),
                         FluxReaction.getFluxReactions(),
@@ -386,23 +274,6 @@ public class Controller implements Initializable {
                         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         lineChart);
             }
-        });
-
-        exportFluxesButton.setOnAction(event -> {
-            //Opening a dialog box
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Save");
-            //Set extension filter for text files
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("JSON files (*.json)", "*.json");
-            fileChooser.getExtensionFilters().add(extFilter);
-
-            //Show save file dialog
-            File file = fileChooser.showSaveDialog(fluxMoleculesVBox.getScene().getWindow());
-            if (file != null) {
-                // System.out.println(file);
-                saveTextToFile(simulation.allFluxesToJson(),file);
-            }
-
         });
     }
 
@@ -505,26 +376,6 @@ public class Controller implements Initializable {
         }
     }
 
-    private String getSampleModel(){
-        return "// this is a comment\n" +
-                "reactions\n" +
-                "r1 : predator -> : 100;\n" +
-                "r2 :  prey -> prey + prey : 300;\n" +
-                "r3 : predator + prey -> predator + predator: 1;\n" +
-                "\n" +
-                "initial state\n" +
-                "predator: 100;\n" +
-                "prey: 100;\n\n" +
-                "end time 0.75;\n\n" +
-                "every 2;\n\n" +
-                "//scaling factor 10;\n\n" +
-                "interval 0.05;\n";
-    }
-
-    private double getEndTime(List< TrajectoryState > trajectory){
-        return trajectory.get(trajectory.size() - 1).getTime();
-    }
-
     private int checkAllCutOffTextField(String cutOffString){
         if (isInteger(cutOffString)){
             return Integer.parseInt(cutOffString);
@@ -542,8 +393,26 @@ public class Controller implements Initializable {
         }
     }
 
+    private void reset(){
+        speciesMap = null;
+        fluxes = null;
+        timeSeries = null;
+        plotSpeciesData = FXCollections.observableArrayList();
+        fluxReactionsData = FXCollections.observableArrayList();
+        fluxSpeciesData = FXCollections.observableArrayList();
+        fluxReactionsVBox.getChildren().clear();
+        fluxMoleculesVBox.getChildren().clear();
+        controlHBox.getChildren().remove(plotButton);
+        controlHBox.getChildren().remove(plotCompleteFluxGraphButton);
+        controlHBox.getChildren().remove(plotIntervalFluxGraphButton);
+        plotButton = null;
+        plotCompleteFluxGraphButton = null;
+        plotIntervalFluxGraphButton = null;
+        PlotSpecies.clearColorMap();
+        openButton.setDisable(false);
+        resetButton.setDisable(true);
+        FluxSpecies.resetFluxGraphSpecies();
+        FluxSpecies.resetColorMap();
+        FluxSpecies.resetCutOffMap();
+    }
 }
-
-
-
-

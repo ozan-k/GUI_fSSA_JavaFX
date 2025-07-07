@@ -17,13 +17,17 @@ public class FluxReaction  implements Comparable<FluxReaction>{
     private String name;
     private ComboBox<String> choiceComboBox;
     private ColorPicker colorPicker = new ColorPicker();
+    private String reaction;
+    private String rate;
 
-    public FluxReaction(int id, String name, String color) {
+    public FluxReaction(int id, String name, String color,String reaction,String rate) {
         this.id = id;
         this.name = name;
         this.choiceComboBox = new ComboBox<>(FXCollections.observableArrayList("Yes", "No"));
         this.choiceComboBox.setValue("Yes");
         this.colorPicker.setValue(Color.web(color));
+        this.reaction = reaction;
+        this.rate = rate;
 
         colorMap.put(id, Color.web(color));
         fluxReactions.add(id);
@@ -64,6 +68,10 @@ public class FluxReaction  implements Comparable<FluxReaction>{
     public ColorPicker getColorPicker(){
         return colorPicker;
     }
+
+    public String getReaction() { return reaction; }
+
+    public String getRate(){ return rate; }
 
     public static void clearColorMap(){
         colorMap.clear();

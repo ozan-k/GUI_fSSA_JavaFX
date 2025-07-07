@@ -1,4 +1,4 @@
-package com.ozank.simulator;
+package com.ozank.dataElements;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -6,25 +6,25 @@ import java.util.Map;
 import java.util.Set;
 
 public class Matrix<T> {
-    private final Map<T,Integer> matrix;
+    private final Map<T,Long> matrix;
 
     public Matrix(){
         matrix = new HashMap<>();
     }
 
-    private Matrix(Map<T,Integer> matrix){
+    private Matrix(Map<T,Long> matrix){
         this.matrix = matrix;
     }
 
-    public Map<T, Integer> getMatrix() {
+    public Map<T, Long> getMatrix() {
         return matrix;
     }
 
-    public int get(T p){
+    public long get(T p){
         return matrix.get(p);
     }
 
-    public void set(T p,int value){
+    public void set(T p, long value){
 
         matrix.put(p,value);
     }
@@ -33,16 +33,16 @@ public class Matrix<T> {
         return matrix.containsKey(p);
     }
     public void increment(T p){
-        int value = matrix.getOrDefault(p,0);
+        long value = matrix.getOrDefault(p,0L);
         matrix.put(p, value+1);
     }
-    public void put(T p, int addedValue){
-        int value = matrix.getOrDefault(p,0);
+    public void put(T p, long addedValue){
+        long value = matrix.getOrDefault(p,0L);
         matrix.put(p, value + addedValue);
     }
 
-    public void remove(T p,int removedValue){
-        int value = matrix.getOrDefault(p,0);
+    public void remove(T p,long removedValue){
+        long value = matrix.getOrDefault(p,0L);
         matrix.put(p, value - removedValue);
     }
 
@@ -50,7 +50,7 @@ public class Matrix<T> {
         if (!matrix.containsKey(p)){
             throw new IllegalArgumentException();
         }
-        int value = matrix.get(p);
+        long value = matrix.get(p);
         if (value==0) {
             throw new IllegalArgumentException();
         }
@@ -70,14 +70,14 @@ public class Matrix<T> {
         }
     }
 
-    public void divideByScalar(int denominator){
+    public void divideByScalar(long denominator){
         for (T index : matrix.keySet()){
             matrix.put(index,matrix.get(index)/denominator);
         }
     }
 
     public Matrix<T> copy(){
-        Map<T,Integer> result = new HashMap<>();
+        Map<T,Long> result = new HashMap<>();
         for (T key : matrix.keySet()){
             result.put(key,matrix.get(key));
         }
@@ -92,7 +92,7 @@ public class Matrix<T> {
         return matrix.keySet();
     }
 
-    public int maxValue(){
+    public long maxValue(){
         return Collections.max(matrix.values());
     }
 

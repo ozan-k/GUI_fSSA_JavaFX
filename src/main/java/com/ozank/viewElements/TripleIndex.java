@@ -1,7 +1,6 @@
-package com.ozank.simulator;
+package com.ozank.viewElements;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class TripleIndex {

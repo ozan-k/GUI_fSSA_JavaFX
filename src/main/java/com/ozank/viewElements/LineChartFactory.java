@@ -1,15 +1,10 @@
 package com.ozank.viewElements;
 
-import com.ozank.simulator.TrajectoryState;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.paint.Color;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class LineChartFactory {
@@ -24,7 +19,9 @@ public class LineChartFactory {
                             double startTime,
                             double endTime){
         trajectory = filterTrajectory(trajectory,startTime,endTime);
-        int max = getMax(trajectory);
+        Set<Integer> plotSpeciesIndexes = new HashSet<>();
+        for (String s : plotSpecies){ plotSpeciesIndexes.add(speciesMap.get(s)); }
+        int max = getMax(trajectory, plotSpeciesIndexes);
 
         //Defining the x axis
         NumberAxis xAxis = new NumberAxis(startTime,endTime, endTime/6);
@@ -51,13 +48,14 @@ public class LineChartFactory {
             //series.setName("No of schools in an year");
             for (TrajectoryState state : trajectory) {
                 if (count == interval) {
-                    series.getData().add(
-                            new XYChart.Data(
-                                    state.getTime(),
-                                    state.getState()[speciesMap.get(modelSpecies)]
-                            )
-                    );
-                    // System.out.println(state.getState()[1]);
+                    try {
+                        series.getData().add(
+                                new XYChart.Data(
+                                        state.getTime(),
+                                        state.getState()[speciesMap.get(modelSpecies) - 1]));
+                    } catch(Exception e){
+                        System.out.println("#" + modelSpecies + " " + speciesMap.get(modelSpecies));
+                    }
                     count = 0;
                 }
                 count++;
@@ -78,13 +76,11 @@ public class LineChartFactory {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
-    private int getMax(List<TrajectoryState> trajectory){
+    private int getMax(List<TrajectoryState> trajectory, Set<Integer> plotSpeciesIndexes){
         int result = 0;
         for (TrajectoryState state : trajectory){
-            result = Math.max(result, Arrays.stream(state.getState())
-                    .max()
-                    .getAsInt());
-
+            // result = Math.max(result, Arrays.stream(state.getState()).max().getAsInt());
+            result = Math.max(result, state.getFilteredStateMax(plotSpeciesIndexes));
         }
         return result;
     }

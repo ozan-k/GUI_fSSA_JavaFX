@@ -5,13 +5,13 @@ import com.brunomnsilva.smartgraph.graphview.SmartLabelSource;
 import java.util.Objects;
 
 public class GEdge implements Comparable<GEdge>{
-    private int weight;
+    private long weight;
     private int id;
     private String speciesName;
     private int source;
     private int target;
 
-    public GEdge(int source, int target, String speciesName, int weight, int id) {
+    public GEdge(int source, int target, String speciesName, long weight, int id) {
         this.source = source;
         this.target = target;
         this.speciesName = speciesName;
@@ -27,11 +27,11 @@ public class GEdge implements Comparable<GEdge>{
         return target;
     }
 
-    public int getWeight() {
+    public long getWeight() {
         return weight;
     }
 
-    public void setWeight(int weight) {
+    public void setWeight(long weight) {
         this.weight = weight;
     }
 

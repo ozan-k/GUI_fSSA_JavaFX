@@ -1,7 +1,6 @@
 package com.ozank.viewElements;
 
 import com.ozank.fluxgui.GraphEdge;
-import com.ozank.simulator.TripleIndex;
 
 import java.util.*;
 

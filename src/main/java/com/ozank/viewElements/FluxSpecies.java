@@ -96,6 +96,18 @@ public class FluxSpecies implements Comparable<FluxSpecies>{
         return fluxGraphSpecies;
     }
 
+    public static void resetFluxGraphSpecies(){
+        fluxGraphSpecies = new HashSet<>();
+    }
+
+    public static void resetColorMap(){
+        colorMap = new HashMap<>();
+    }
+
+    public static void resetCutOffMap(){
+        cutOffMap =  new HashMap<>();
+    }
+
     @Override
     public int compareTo(FluxSpecies o) {
         return CharSequence.compare(getName(), o.getName());

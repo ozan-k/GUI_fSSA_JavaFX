@@ -6,7 +6,6 @@ import com.brunomnsilva.smartgraph.graph.Vertex;
 import com.ozank.fluxgui.GEdge;
 import com.ozank.fluxgui.GReaction;
 import com.ozank.fluxgui.GraphEdge;
-import com.ozank.simulator.TripleIndex;
 import javafx.scene.paint.Color;
 
 import java.util.*;
